@@ -1,14 +1,40 @@
+import { useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Bot, Database, Settings, TrendingUp, Users, FileText, Zap } from "lucide-react";
+import { MessageSquare, Bot, Database, Settings, TrendingUp, Users, FileText, Zap, LogOut, User } from "lucide-react";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { ChatBotStatus } from "@/components/dashboard/ChatBotStatus";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
+import { useAuth } from "@/hooks/useAuth";
 import heroImage from "@/assets/chatbot-hero.jpg";
 
 const Index = () => {
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex items-center space-x-2">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -29,9 +55,13 @@ const Index = () => {
                 <div className="w-2 h-2 bg-success rounded-full mr-2 animate-pulse" />
                 Online
               </Badge>
-              <Button variant="default" className="bg-gradient-primary shadow-primary">
-                <Settings className="w-4 h-4 mr-2" />
-                Configurações
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="w-4 h-4" />
+                {user.email}
+              </div>
+              <Button variant="outline" size="sm" onClick={signOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair
               </Button>
             </div>
           </div>
